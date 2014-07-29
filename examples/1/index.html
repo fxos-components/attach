@@ -1,24 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
   <meta charset="utf-8">
-  <title>Delegate Example</title>
+  <title>attach.js Example</title>
+  <style>
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .sub-item {
+      font-size: 10px;
+    }
+    #output {
+      border: 1px solid #f00;
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      left: 5px;
+      height: 6em;
+      overflow: hidden;
+      overflow-y: auto;
+    }
+    #output p { margin: 0; }
+    #output p { color: #333; }
+    #output p:nth-child(even) { color: #999; }
+  </style>
 </head>
 <body>
-  <div class="parent">
-    <li>Click me</li>
-    <li>Click me</li>
-    <li>Click me</li>
-    <li>Click me</li>
-    <li>Click me</li>
-    <li>Click me</li>
-  </div>
-  <script src="../index.js"></script>
-  <script>
-    var el = document.querySelector('.parent');
+  <h3>Click an item to see the event appear in the log below</h3>
+  <ul id="parent">
+    <li>
+      <a href="#item1">
+        Item 1
+        <span class="sub-item">[Sub-Item 1]</span>
+      </a>
+    </li>
+    <li>
+      <a href="#item2">
+        Item 2
+        <span class="sub-item">[Sub-Item 2]</span>
+      </a>
+    </li>
+    <li>
+      <a href="#item3">
+        Item 3
+        <span class="sub-item">[Sub-Item 3]</span>
+      </a>
+    </li>
+    <li>
+      <a href="#item4">
+        Item 4
+        <span class="sub-item">[Sub-Item 4]</span>
+      </a>
+    </li>
+    <li>
+      <a href="#item5">
+        Item 5
+        <span class="sub-item">[Sub-Item 5]</span>
+      </a>
+    </li>
+  </ul>
+  <div id="output"></div>
 
-    attach.on(el, 'click', 'li', function(event) {
-      this.style.color = 'red';
+  <script src="../../index.js"></script>
+  <script>
+    var parent = document.getElementById('parent');
+    var output = document.getElementById('output');
+
+    // Attaching single event handlers
+    attach(parent, 'mouseover', 'li', function(evt) {
+      this.style.color = '#f00';
+    });
+
+    attach(parent, 'mouseout', 'li', function(evt) {
+      this.style.color = '#000';
+    });
+
+    // Attaching multiple event handlers
+    attach(parent, {
+      'click a': function(evt) {
+        output.innerHTML += '<p>Clicked Item: ' + this.hash + '</p>';
+        output.scrollTop = output.scrollHeight;
+        evt.preventDefault();
+      },
+      'click a > .sub-item': function(evt) {
+        output.innerHTML += '<p>Clicked Sub-Item: ' + this.innerHTML + '</p>';
+        output.scrollTop = output.scrollHeight;
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
     });
   </script>
 </body>

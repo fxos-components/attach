@@ -102,6 +102,22 @@ suite('bind', function() {
     assert(callback.called, 'The callback should have been called');
   });
 
+  test('Should stopPropagation if stopPropagation is called', function() {
+    var parent = $('.parent');
+    var baz = $('.baz');
+    var callback2 = sinon.spy();
+    var callback1 = sinon.spy(function(e) { e.stopPropagation(); });
+
+    attach.on(parent, 'click', callback2);
+    attach.on(parent, 'click', '.bar', callback2);
+    attach.on(parent, 'click', '.baz', callback1);
+
+    simulate('click', baz);
+
+    assert(callback1.called, 'The first callback should have been called');
+    assert(!callback2.called, 'Callbacks further up the DOM should not have been called');
+  });
+
   test('Should stopPropagation if false is returned from callback', function() {
     var parent = $('.parent');
     var baz = $('.baz');
@@ -124,8 +140,8 @@ suite('bind', function() {
     var baz = $('.baz');
 
     attach(parent, {
-      'click': callback,
-      'click .baz': callback
+      'click .baz': callback,
+      'click .bar .baz': callback
     });
 
     simulate('click', baz);
